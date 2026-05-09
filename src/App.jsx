@@ -3,139 +3,91 @@ import "./index.css"
 
 export default function App() {
   const [tab, setTab] = useState("dashboard")
-  const [note, setNote] = useState("")
-  const [aiResult, setAiResult] = useState("")
-  const [loading, setLoading] = useState(false)
-
-  const runMockAI = async () => {
-    setLoading(true)
-
-    try {
-      // güvenli fallback (API olmasa bile crash yok)
-      await new Promise((r) => setTimeout(r, 800))
-
-      setAiResult(
-        "AI Summary: Patient shows mild depressive symptoms. Recommend structured therapy and follow-up."
-      )
-    } catch (err) {
-      setAiResult("AI Error occurred")
-    }
-
-    setLoading(false)
-  }
 
   return (
-    <div style={styles.app}>
+    <div style={styles.shell}>
       {/* SIDEBAR */}
       <div style={styles.sidebar}>
-        <h2>🏥 ClinicAI</h2>
+        <h2 style={{ marginBottom: 20 }}>🏥 ClinicAI</h2>
 
-        <button style={styles.btn} onClick={() => setTab("dashboard")}>
-          Dashboard
-        </button>
-
-        <button style={styles.btn} onClick={() => setTab("patients")}>
-          Patients
-        </button>
-
-        <button style={styles.btn} onClick={() => setTab("sessions")}>
-          Sessions
-        </button>
-
-        <button style={styles.btn} onClick={() => setTab("ai")}>
-          AI Reports
-        </button>
+        <button onClick={() => setTab("dashboard")}>Dashboard</button>
+        <button onClick={() => setTab("patients")}>Patients</button>
+        <button onClick={() => setTab("sessions")}>Sessions</button>
+        <button onClick={() => setTab("ai")}>AI Reports</button>
       </div>
 
-      {/* CONTENT */}
-      <div style={styles.content}>
-        {tab === "dashboard" && (
-          <div>
-            <h1>Dashboard</h1>
-            <p>Active Patients: 128</p>
-            <p>Sessions: 742</p>
-            <p>AI Reports: 1284</p>
-          </div>
-        )}
+      {/* MAIN */}
+      <div style={styles.main}>
+        <div style={styles.card}>
+          {tab === "dashboard" && (
+            <>
+              <h1>Dashboard</h1>
+              <p>Active Patients: 128</p>
+              <p>Sessions: 742</p>
+              <p>AI Reports: 1284</p>
+            </>
+          )}
 
-        {tab === "patients" && (
-          <div>
-            <h1>Patients</h1>
-            <ul>
-              <li>Ayşe Yılmaz</li>
-              <li>Mehmet Kaya</li>
-              <li>Elif Demir</li>
-            </ul>
-          </div>
-        )}
+          {tab === "patients" && (
+            <>
+              <h1>Patients</h1>
+              <ul>
+                <li>Ayşe Yılmaz</li>
+                <li>Mehmet Kaya</li>
+                <li>Elif Demir</li>
+              </ul>
+            </>
+          )}
 
-        {tab === "sessions" && (
-          <div>
-            <h1>Session Notes</h1>
+          {tab === "sessions" && (
+            <>
+              <h1>Sessions</h1>
+              <textarea placeholder="Session notes..." style={styles.input} />
+            </>
+          )}
 
-            <textarea
-              style={styles.textarea}
-              placeholder="Write session notes..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </div>
-        )}
-
-        {tab === "ai" && (
-          <div>
-            <h1>AI Reports</h1>
-
-            <button style={styles.primaryBtn} onClick={runMockAI}>
-              {loading ? "Analyzing..." : "Run AI Analysis"}
-            </button>
-
-            <div style={{ marginTop: 20 }}>
-              {aiResult && <p>{aiResult}</p>}
-            </div>
-          </div>
-        )}
+          {tab === "ai" && (
+            <>
+              <h1>AI Reports</h1>
+              <p>
+                AI Summary: Patient shows mild depressive symptoms.
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
 }
 
-/* SAFE INLINE STYLES (CSS CRASH YOK) */
 const styles = {
-  app: {
+  shell: {
     display: "flex",
-    minHeight: "100vh",
+    height: "100vh",
     fontFamily: "system-ui",
+    background: "#f6f7fb",
   },
   sidebar: {
-    width: 220,
-    borderRight: "1px solid #ddd",
+    width: 240,
+    background: "#111827",
+    color: "white",
     padding: 20,
     display: "flex",
     flexDirection: "column",
     gap: 10,
   },
-  content: {
+  main: {
     flex: 1,
     padding: 30,
+    overflow: "auto",
   },
-  btn: {
-    padding: 10,
-    cursor: "pointer",
-    background: "#f3f3f3",
-    border: "none",
-    borderRadius: 6,
-    textAlign: "left",
+  card: {
+    background: "white",
+    padding: 20,
+    borderRadius: 12,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
   },
-  primaryBtn: {
-    padding: 10,
-    background: "#7c3aed",
-    color: "white",
-    border: "none",
-    borderRadius: 6,
-    cursor: "pointer",
-  },
-  textarea: {
+  input: {
     width: "100%",
     height: 120,
     padding: 10,
