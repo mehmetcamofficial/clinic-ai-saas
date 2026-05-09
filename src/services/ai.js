@@ -3,66 +3,41 @@ export async function analyzeSession(note) {
 
   // 1. ENV CHECK (kritik)
   if (!key) {
-    console.error("❌ ENV missing: VITE_OPENROUTER_API_KEY")
-    return "❌ API key not loaded from Vercel environment"
+    return "❌ API key not loaded from Vercel env"
   }
 
-  console.log("✅ API KEY LOADED")
+  const response = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
 
-  try {
-    // 2. API CALL
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${key}`,
-          "HTTP-Referer": window.location.origin,
-          "X-Title": "Clinic AI SaaS",
-        },
-        body: JSON.stringify({
-          // 🔥 STABLE MODEL (en az hata veren)
-          model: "mistralai/mistral-7b-instruct",
-
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a professional clinical AI assistant. Summarize patient notes in structured medical format.",
-            },
-            {
-              role: "user",
-              content: note,
-            },
-          ],
-
-          temperature: 0.3,
-        }),
-      }
-    )
-
-    // 3. RAW RESPONSE
-    const data = await response.json()
-
-    console.log("🧠 OPENROUTER RAW RESPONSE:", data)
-
-    // 4. ERROR CHECK
-    if (data.error) {
-      console.error("❌ API ERROR:", data.error)
-      return `❌ API Error: ${data.error.message}`
+        messages: [
+          {
+            role: "system",
+            content: "You are a clinical assistant AI.",
+          },
+          {
+            role: "user",
+            content: note,
+          },
+        ],
+      }),
     }
+  )
 
-    // 5. SAFE OUTPUT
-    const output = data?.choices?.[0]?.message?.content
+  const data = await response.json()
 
-    if (!output) {
-      return "❌ Empty AI response"
-    }
+  console.log("OPENROUTER RESPONSE:", data)
 
-    return output
-  } catch (err) {
-    console.error("❌ NETWORK ERROR:", err)
-    return "❌ Network or API failure"
-  }
+  return (
+    data?.choices?.[0]?.message?.content ||
+    data?.error?.message ||
+    "❌ No response"
+  )
 }
