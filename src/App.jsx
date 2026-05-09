@@ -1,116 +1,144 @@
 import { useState } from "react"
-import { analyzeSession } from "./services/ai"
 import "./index.css"
 
 export default function App() {
   const [tab, setTab] = useState("dashboard")
-  const [note, setNote] = useState("")
-  const [aiResult, setAiResult] = useState("")
-  const [loading, setLoading] = useState(false)
-
-  const runAI = async () => {
-    setLoading(true)
-
-    const result = await analyzeSession(note)
-
-    setAiResult(result)
-    setLoading(false)
-  }
 
   return (
-    <div style={styles.shell}>
+    <div style={styles.app}>
       {/* SIDEBAR */}
-      <div style={styles.sidebar}>
-        <h2>🏥 ClinicAI</h2>
+      <aside style={styles.sidebar}>
+        <div style={styles.logo}>🏥 ClinicAI</div>
 
-        <button onClick={() => setTab("dashboard")}>Dashboard</button>
-        <button onClick={() => setTab("patients")}>Patients</button>
-        <button onClick={() => setTab("sessions")}>Sessions</button>
-        <button onClick={() => setTab("ai")}>AI Reports</button>
-      </div>
+        <nav style={styles.nav}>
+          <button onClick={() => setTab("dashboard")}>Dashboard</button>
+          <button onClick={() => setTab("patients")}>Patients</button>
+          <button onClick={() => setTab("sessions")}>Sessions</button>
+          <button onClick={() => setTab("ai")}>AI Reports</button>
+        </nav>
+      </aside>
 
-      {/* MAIN */}
-      <div style={styles.main}>
-        <div style={styles.card}>
+      {/* CONTENT */}
+      <main style={styles.main}>
+        <div style={styles.header}>
+          <h1>{tab.toUpperCase()}</h1>
+          <p>Clinical intelligence dashboard</p>
+        </div>
+
+        <div style={styles.grid}>
           {tab === "dashboard" && (
             <>
-              <h1>Dashboard</h1>
-              <p>Active Patients: 128</p>
-              <p>Sessions: 742</p>
-              <p>AI Reports: 1284</p>
+              <Card title="Active Patients" value="128" />
+              <Card title="Sessions" value="742" />
+              <Card title="AI Reports" value="1,284" />
             </>
           )}
 
           {tab === "patients" && (
-            <>
-              <h1>Patients</h1>
-              <ul>
-                <li>Ayşe Yılmaz</li>
-                <li>Mehmet Kaya</li>
-                <li>Elif Demir</li>
-              </ul>
-            </>
+            <CardList
+              items={["Ayşe Yılmaz", "Mehmet Kaya", "Elif Demir"]}
+            />
           )}
 
           {tab === "sessions" && (
-            <>
-              <h1>Sessions</h1>
-
-              <textarea
-                style={styles.textarea}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder="Write session notes..."
-              />
-            </>
+            <div style={styles.card}>
+              <h3>Session Notes</h3>
+              <textarea style={styles.textarea} />
+            </div>
           )}
 
           {tab === "ai" && (
-            <>
-              <h1>AI Reports</h1>
-
-              <button style={styles.btn} onClick={runAI}>
-                {loading ? "Analyzing..." : "Run AI Analysis"}
-              </button>
-
-              {aiResult && (
-                <pre style={styles.report}>{aiResult}</pre>
-              )}
-            </>
+            <div style={styles.card}>
+              <h3>AI Reports</h3>
+              <p>AI module ready for integration</p>
+            </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }
 
+/* COMPONENTS */
+function Card({ title, value }) {
+  return (
+    <div style={styles.card}>
+      <h3>{title}</h3>
+      <p style={styles.big}>{value}</p>
+    </div>
+  )
+}
+
+function CardList({ items }) {
+  return (
+    <div style={styles.card}>
+      <h3>Patients</h3>
+      <ul>
+        {items.map((i) => (
+          <li key={i}>{i}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+/* STYLES */
 const styles = {
-  shell: {
+  app: {
     display: "flex",
     height: "100vh",
     fontFamily: "system-ui",
-    background: "#f6f7fb",
+    background: "#f4f6fb",
   },
+
   sidebar: {
-    width: 240,
-    background: "#111827",
+    width: 260,
+    background: "#0f172a",
     color: "white",
     padding: 20,
     display: "flex",
     flexDirection: "column",
+  },
+
+  logo: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
+
+  nav: {
+    display: "flex",
+    flexDirection: "column",
     gap: 10,
   },
+
   main: {
     flex: 1,
     padding: 30,
-    overflow: "auto",
   },
+
+  header: {
+    marginBottom: 20,
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: 20,
+  },
+
   card: {
     background: "white",
     padding: 20,
-    borderRadius: 12,
-    boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+    borderRadius: 14,
+    boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
   },
+
+  big: {
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+
   textarea: {
     width: "100%",
     height: 120,
