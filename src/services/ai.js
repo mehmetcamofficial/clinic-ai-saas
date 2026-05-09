@@ -16,7 +16,7 @@ export async function analyzeSession(note) {
           {
             role: "system",
             content:
-              "You are a clinical assistant. Give structured medical summary.",
+              "You are a clinical assistant. Give structured medical summaries. Be concise.",
           },
           {
             role: "user",
@@ -28,6 +28,10 @@ export async function analyzeSession(note) {
   )
 
   const data = await res.json()
+
+  if (data?.error) {
+    return "❌ " + data.error.message
+  }
 
   return data?.choices?.[0]?.message?.content || "No response"
 }
