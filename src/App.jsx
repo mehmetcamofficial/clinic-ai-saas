@@ -1,155 +1,144 @@
 import { useState } from "react"
-import { analyzeSession } from "./services/ai"
+import "./index.css"
 
 export default function App() {
+  const [tab, setTab] = useState("dashboard")
   const [note, setNote] = useState("")
-  const [summary, setSummary] = useState("")
+  const [aiResult, setAiResult] = useState("")
   const [loading, setLoading] = useState(false)
 
-  const runAI = async () => {
-    if (!note.trim()) return
-
+  const runMockAI = async () => {
     setLoading(true)
-    setSummary("")
 
     try {
-      const result = await analyzeSession(note)
-      setSummary(result)
+      // güvenli fallback (API olmasa bile crash yok)
+      await new Promise((r) => setTimeout(r, 800))
+
+      setAiResult(
+        "AI Summary: Patient shows mild depressive symptoms. Recommend structured therapy and follow-up."
+      )
     } catch (err) {
-      setSummary("AI Error")
+      setAiResult("AI Error occurred")
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex">
-
+    <div style={styles.app}>
       {/* SIDEBAR */}
-      <div className="w-72 bg-slate-900 border-r border-slate-800 p-6">
+      <div style={styles.sidebar}>
+        <h2>🏥 ClinicAI</h2>
 
-        <h1 className="text-2xl font-bold mb-10">
-          🏥 ClinicAI
-        </h1>
+        <button style={styles.btn} onClick={() => setTab("dashboard")}>
+          Dashboard
+        </button>
 
-        <div className="space-y-3">
+        <button style={styles.btn} onClick={() => setTab("patients")}>
+          Patients
+        </button>
 
-          <div className="bg-slate-800 p-4 rounded-xl">
-            Dashboard
-          </div>
+        <button style={styles.btn} onClick={() => setTab("sessions")}>
+          Sessions
+        </button>
 
-          <div className="bg-slate-800 p-4 rounded-xl">
-            Patients
-          </div>
-
-          <div className="bg-slate-800 p-4 rounded-xl">
-            Sessions
-          </div>
-
-          <div className="bg-slate-800 p-4 rounded-xl">
-            AI Reports
-          </div>
-
-        </div>
-
-        <div className="mt-10">
-          <h3 className="text-slate-400 mb-3">
-            Active Patients
-          </h3>
-
-          <div className="space-y-2">
-
-            <div className="bg-slate-800 p-3 rounded-lg">
-              Ayşe Yılmaz
-            </div>
-
-            <div className="bg-slate-800 p-3 rounded-lg">
-              Mehmet Kaya
-            </div>
-
-            <div className="bg-slate-800 p-3 rounded-lg">
-              Elif Demir
-            </div>
-
-          </div>
-        </div>
-
+        <button style={styles.btn} onClick={() => setTab("ai")}>
+          AI Reports
+        </button>
       </div>
 
-      {/* MAIN */}
-      <div className="flex-1 p-10">
-
-        <div className="mb-10">
-
-          <h1 className="text-4xl font-bold mb-2">
-            AI Clinical Assistant
-          </h1>
-
-          <p className="text-slate-400">
-            Analyze therapy sessions with AI-powered summaries.
-          </p>
-
-        </div>
-
-        {/* CARDS */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-
-          <div className="bg-slate-900 p-6 rounded-2xl">
-            <h3 className="text-slate-400">Patients</h3>
-            <p className="text-3xl font-bold mt-2">128</p>
+      {/* CONTENT */}
+      <div style={styles.content}>
+        {tab === "dashboard" && (
+          <div>
+            <h1>Dashboard</h1>
+            <p>Active Patients: 128</p>
+            <p>Sessions: 742</p>
+            <p>AI Reports: 1284</p>
           </div>
+        )}
 
-          <div className="bg-slate-900 p-6 rounded-2xl">
-            <h3 className="text-slate-400">Sessions</h3>
-            <p className="text-3xl font-bold mt-2">742</p>
+        {tab === "patients" && (
+          <div>
+            <h1>Patients</h1>
+            <ul>
+              <li>Ayşe Yılmaz</li>
+              <li>Mehmet Kaya</li>
+              <li>Elif Demir</li>
+            </ul>
           </div>
+        )}
 
-          <div className="bg-slate-900 p-6 rounded-2xl">
-            <h3 className="text-slate-400">AI Reports</h3>
-            <p className="text-3xl font-bold mt-2">1,284</p>
+        {tab === "sessions" && (
+          <div>
+            <h1>Session Notes</h1>
+
+            <textarea
+              style={styles.textarea}
+              placeholder="Write session notes..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
           </div>
+        )}
 
-        </div>
+        {tab === "ai" && (
+          <div>
+            <h1>AI Reports</h1>
 
-        {/* NOTE AREA */}
-        <div className="bg-slate-900 rounded-2xl p-6">
+            <button style={styles.primaryBtn} onClick={runMockAI}>
+              {loading ? "Analyzing..." : "Run AI Analysis"}
+            </button>
 
-          <h2 className="text-2xl font-bold mb-4">
-            Session Notes
-          </h2>
-
-          <textarea
-            className="w-full h-52 bg-slate-800 rounded-xl p-4 outline-none border border-slate-700"
-            placeholder="Write session notes..."
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
-
-          <button
-            onClick={runAI}
-            disabled={loading}
-            className="mt-5 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-bold transition"
-          >
-            {loading ? "Analyzing..." : "Run AI Analysis"}
-          </button>
-
-        </div>
-
-        {/* AI OUTPUT */}
-        <div className="bg-slate-900 rounded-2xl p-6 mt-8">
-
-          <h2 className="text-2xl font-bold mb-4">
-            AI Summary
-          </h2>
-
-          <div className="text-slate-300 whitespace-pre-wrap">
-            {summary || "AI response will appear here."}
+            <div style={{ marginTop: 20 }}>
+              {aiResult && <p>{aiResult}</p>}
+            </div>
           </div>
-
-        </div>
-
+        )}
       </div>
-
     </div>
   )
+}
+
+/* SAFE INLINE STYLES (CSS CRASH YOK) */
+const styles = {
+  app: {
+    display: "flex",
+    minHeight: "100vh",
+    fontFamily: "system-ui",
+  },
+  sidebar: {
+    width: 220,
+    borderRight: "1px solid #ddd",
+    padding: 20,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  content: {
+    flex: 1,
+    padding: 30,
+  },
+  btn: {
+    padding: 10,
+    cursor: "pointer",
+    background: "#f3f3f3",
+    border: "none",
+    borderRadius: 6,
+    textAlign: "left",
+  },
+  primaryBtn: {
+    padding: 10,
+    background: "#7c3aed",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+  },
+  textarea: {
+    width: "100%",
+    height: 120,
+    padding: 10,
+    marginTop: 10,
+  },
 }
