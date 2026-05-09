@@ -10,17 +10,17 @@ export async function analyzeSession(note) {
         Authorization: `Bearer ${key}`,
       },
       body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
+        model: "openai/gpt-4o-mini",
 
         messages: [
           {
             role: "system",
             content:
-              "You are a clinical assistant. Summarize patient notes clearly.",
+              "You are a clinical assistant. Give structured medical summary.",
           },
           {
             role: "user",
-            content: note || "No input provided",
+            content: note,
           },
         ],
       }),
@@ -29,9 +29,5 @@ export async function analyzeSession(note) {
 
   const data = await res.json()
 
-  return (
-    data?.choices?.[0]?.message?.content ||
-    data?.error?.message ||
-    "No response"
-  )
+  return data?.choices?.[0]?.message?.content || "No response"
 }

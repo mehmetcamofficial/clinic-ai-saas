@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { analyzeSession } from "./services/ai"
 import "./index.css"
 
 export default function App() {
@@ -7,15 +8,19 @@ export default function App() {
   const [aiResult, setAiResult] = useState("")
   const [loading, setLoading] = useState(false)
 
-  const runAnalysis = () => {
+  const runAnalysis = async () => {
+    if (!note) return
+
     setLoading(true)
 
-    setTimeout(() => {
-      setAiResult(
-        "AI Summary: Patient shows mild depressive symptoms. Risk: Low. Recommendation: Therapy follow-up."
-      )
-      setLoading(false)
-    }, 800)
+    try {
+      const result = await analyzeSession(note)
+      setAiResult(result)
+    } catch (err) {
+      setAiResult("❌ AI Error: " + err.message)
+    }
+
+    setLoading(false)
   }
 
   return (
@@ -34,29 +39,23 @@ export default function App() {
 
       {/* MAIN */}
       <main style={styles.main}>
-        <div style={styles.header}>
-          <h1>{tab}</h1>
-          <p>Clinical intelligence dashboard</p>
-        </div>
+        <h1>{tab.toUpperCase()}</h1>
 
         {/* DASHBOARD */}
         {tab === "dashboard" && (
-          <div style={styles.grid}>
-            <Card title="Active Patients" value="128" />
-            <Card title="Sessions" value="742" />
-            <Card title="AI Reports" value="1,284" />
+          <div style={styles.card}>
+            <p>Active Patients: 128</p>
+            <p>Sessions: 742</p>
+            <p>AI Reports: 1284</p>
           </div>
         )}
 
         {/* PATIENTS */}
         {tab === "patients" && (
           <div style={styles.card}>
-            <h3>Patients</h3>
-            <ul>
-              <li>Ayşe Yılmaz</li>
-              <li>Mehmet Kaya</li>
-              <li>Elif Demir</li>
-            </ul>
+            <p>Ayşe Yılmaz</p>
+            <p>Mehmet Kaya</p>
+            <p>Elif Demir</p>
           </div>
         )}
 
@@ -90,9 +89,7 @@ export default function App() {
             </button>
 
             {aiResult && (
-              <div style={styles.result}>
-                {aiResult}
-              </div>
+              <pre style={styles.result}>{aiResult}</pre>
             )}
           </div>
         )}
@@ -200,7 +197,7 @@ const styles = {
   btn: {
     marginTop: 10,
     padding: 10,
-    background: "#1d4ed8",
+    background: "#2563eb",
     color: "white",
     border: "none",
     borderRadius: 8,
@@ -210,6 +207,8 @@ const styles = {
 
   result: {
     marginTop: 15,
+    whiteSpace: "pre-wrap",
+    background: "#f8fafc",
     padding: 10,
     background: "#f1f5f9",
     borderRadius: 8,
