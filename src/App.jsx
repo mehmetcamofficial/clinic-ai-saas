@@ -3,6 +3,20 @@ import "./index.css"
 
 export default function App() {
   const [tab, setTab] = useState("dashboard")
+  const [note, setNote] = useState("")
+  const [aiResult, setAiResult] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const runAnalysis = () => {
+    setLoading(true)
+
+    setTimeout(() => {
+      setAiResult(
+        "AI Summary: Patient shows mild depressive symptoms. Risk: Low. Recommendation: Therapy follow-up."
+      )
+      setLoading(false)
+    }, 800)
+  }
 
   return (
     <div style={styles.app}>
@@ -11,73 +25,103 @@ export default function App() {
         <div style={styles.logo}>🏥 ClinicAI</div>
 
         <nav style={styles.nav}>
-          <button onClick={() => setTab("dashboard")}>Dashboard</button>
-          <button onClick={() => setTab("patients")}>Patients</button>
-          <button onClick={() => setTab("sessions")}>Sessions</button>
-          <button onClick={() => setTab("ai")}>AI Reports</button>
+          <NavItem tab="dashboard" current={tab} setTab={setTab} />
+          <NavItem tab="patients" current={tab} setTab={setTab} />
+          <NavItem tab="sessions" current={tab} setTab={setTab} />
+          <NavItem tab="ai" current={tab} setTab={setTab} />
         </nav>
       </aside>
 
-      {/* CONTENT */}
+      {/* MAIN */}
       <main style={styles.main}>
         <div style={styles.header}>
-          <h1>{tab.toUpperCase()}</h1>
+          <h1>{tab}</h1>
           <p>Clinical intelligence dashboard</p>
         </div>
 
-        <div style={styles.grid}>
-          {tab === "dashboard" && (
-            <>
-              <Card title="Active Patients" value="128" />
-              <Card title="Sessions" value="742" />
-              <Card title="AI Reports" value="1,284" />
-            </>
-          )}
+        {/* DASHBOARD */}
+        {tab === "dashboard" && (
+          <div style={styles.grid}>
+            <Card title="Active Patients" value="128" />
+            <Card title="Sessions" value="742" />
+            <Card title="AI Reports" value="1,284" />
+          </div>
+        )}
 
-          {tab === "patients" && (
-            <CardList
-              items={["Ayşe Yılmaz", "Mehmet Kaya", "Elif Demir"]}
+        {/* PATIENTS */}
+        {tab === "patients" && (
+          <div style={styles.card}>
+            <h3>Patients</h3>
+            <ul>
+              <li>Ayşe Yılmaz</li>
+              <li>Mehmet Kaya</li>
+              <li>Elif Demir</li>
+            </ul>
+          </div>
+        )}
+
+        {/* SESSIONS */}
+        {tab === "sessions" && (
+          <div style={styles.card}>
+            <h3>Session Notes</h3>
+            <textarea
+              style={styles.textarea}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Write session notes..."
             />
-          )}
+          </div>
+        )}
 
-          {tab === "sessions" && (
-            <div style={styles.card}>
-              <h3>Session Notes</h3>
-              <textarea style={styles.textarea} />
-            </div>
-          )}
+        {/* AI */}
+        {tab === "ai" && (
+          <div style={styles.card}>
+            <h3>AI Analysis</h3>
 
-          {tab === "ai" && (
-            <div style={styles.card}>
-              <h3>AI Reports</h3>
-              <p>AI module ready for integration</p>
-            </div>
-          )}
-        </div>
+            <textarea
+              style={styles.textarea}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Enter patient note..."
+            />
+
+            <button style={styles.btn} onClick={runAnalysis}>
+              {loading ? "Analyzing..." : "Run AI Analysis"}
+            </button>
+
+            {aiResult && (
+              <div style={styles.result}>
+                {aiResult}
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   )
 }
 
-/* COMPONENTS */
+/* SIDEBAR ITEM */
+function NavItem({ tab, current, setTab }) {
+  return (
+    <button
+      onClick={() => setTab(tab)}
+      style={{
+        ...styles.navItem,
+        background: current === tab ? "#1d4ed8" : "transparent",
+      }}
+    >
+      {tab}
+    </button>
+  )
+}
+
+/* CARD */
 function Card({ title, value }) {
   return (
     <div style={styles.card}>
       <h3>{title}</h3>
       <p style={styles.big}>{value}</p>
-    </div>
-  )
-}
-
-function CardList({ items }) {
-  return (
-    <div style={styles.card}>
-      <h3>Patients</h3>
-      <ul>
-        {items.map((i) => (
-          <li key={i}>{i}</li>
-        ))}
-      </ul>
     </div>
   )
 }
@@ -92,12 +136,10 @@ const styles = {
   },
 
   sidebar: {
-    width: 260,
+    width: 240,
     background: "#0f172a",
     color: "white",
     padding: 20,
-    display: "flex",
-    flexDirection: "column",
   },
 
   logo: {
@@ -110,6 +152,15 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 10,
+  },
+
+  navItem: {
+    padding: 10,
+    borderRadius: 8,
+    border: "none",
+    color: "white",
+    textAlign: "left",
+    cursor: "pointer",
   },
 
   main: {
@@ -145,19 +196,22 @@ const styles = {
     marginTop: 10,
     padding: 10,
   },
+
   btn: {
+    marginTop: 10,
     padding: 10,
-    background: "#7c3aed",
+    background: "#1d4ed8",
     color: "white",
     border: "none",
-    borderRadius: 6,
+    borderRadius: 8,
     cursor: "pointer",
     marginTop: 10,
   },
-  report: {
-    marginTop: 20,
-    background: "#f9fafb",
-    padding: 12,
+
+  result: {
+    marginTop: 15,
+    padding: 10,
+    background: "#f1f5f9",
     borderRadius: 8,
     whiteSpace: "pre-wrap",
   },
