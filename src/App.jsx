@@ -3,17 +3,39 @@ import "./index.css"
 
 export default function App() {
   const [tab, setTab] = useState("dashboard")
+  const [note, setNote] = useState("")
+  const [aiResult, setAiResult] = useState("")
+
+  const runMockAI = () => {
+    setAiResult({
+      summary: "Patient shows mild depressive symptoms.",
+      risk: "Low",
+      recommendation: "Therapy follow-up recommended",
+      nextStep: "Weekly monitoring advised",
+    })
+  }
 
   return (
-    <div style={styles.shell}>
+    <div style={styles.app}>
       {/* SIDEBAR */}
       <div style={styles.sidebar}>
-        <h2 style={{ marginBottom: 20 }}>🏥 ClinicAI</h2>
+        <h2>🏥 ClinicAI</h2>
 
-        <button onClick={() => setTab("dashboard")}>Dashboard</button>
-        <button onClick={() => setTab("patients")}>Patients</button>
-        <button onClick={() => setTab("sessions")}>Sessions</button>
-        <button onClick={() => setTab("ai")}>AI Reports</button>
+        <button onClick={() => setTab("dashboard")} style={styles.btn}>
+          Dashboard
+        </button>
+
+        <button onClick={() => setTab("patients")} style={styles.btn}>
+          Patients
+        </button>
+
+        <button onClick={() => setTab("sessions")} style={styles.btn}>
+          Sessions
+        </button>
+
+        <button onClick={() => setTab("ai")} style={styles.btn}>
+          AI Reports
+        </button>
       </div>
 
       {/* MAIN */}
@@ -42,16 +64,44 @@ export default function App() {
           {tab === "sessions" && (
             <>
               <h1>Sessions</h1>
-              <textarea placeholder="Session notes..." style={styles.input} />
+              <textarea
+                style={styles.textarea}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Write session notes..."
+              />
             </>
           )}
 
           {tab === "ai" && (
             <>
               <h1>AI Reports</h1>
-              <p>
-                AI Summary: Patient shows mild depressive symptoms.
-              </p>
+
+              <button style={styles.primaryBtn} onClick={runMockAI}>
+                Run AI Analysis
+              </button>
+
+              {aiResult && (
+                <div style={styles.reportCard}>
+                  <h3>Clinical Summary</h3>
+
+                  <p>
+                    <b>Summary:</b> {aiResult.summary}
+                  </p>
+
+                  <p>
+                    <b>Risk Level:</b> {aiResult.risk}
+                  </p>
+
+                  <p>
+                    <b>Recommendation:</b> {aiResult.recommendation}
+                  </p>
+
+                  <p>
+                    <b>Next Step:</b> {aiResult.nextStep}
+                  </p>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -61,7 +111,7 @@ export default function App() {
 }
 
 const styles = {
-  shell: {
+  app: {
     display: "flex",
     height: "100vh",
     fontFamily: "system-ui",
@@ -87,10 +137,35 @@ const styles = {
     borderRadius: 12,
     boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
   },
-  input: {
+  btn: {
+    padding: 10,
+    background: "#1f2937",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+    textAlign: "left",
+  },
+  primaryBtn: {
+    padding: 10,
+    background: "#7c3aed",
+    color: "white",
+    border: "none",
+    borderRadius: 6,
+    cursor: "pointer",
+    marginTop: 10,
+  },
+  textarea: {
     width: "100%",
     height: 120,
-    padding: 10,
     marginTop: 10,
+    padding: 10,
+  },
+  reportCard: {
+    marginTop: 20,
+    padding: 16,
+    background: "#f9fafb",
+    borderRadius: 10,
+    border: "1px solid #e5e7eb",
   },
 }
